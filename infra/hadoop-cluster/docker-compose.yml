@@ -1,0 +1,115 @@
+services:
+  namenode:
+    image: apache/hadoop:3
+    container_name: taxi-namenode
+    hostname: namenode
+    restart: always
+    environment:
+      - ENSURE_NAMENODE_DIR=/hadoop/dfs/name/current
+      - ENSURE_NAMENODE_CLUSTERID=CID-taxi-hadoop-cluster
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+    entrypoint: ["sh", "-c", "sudo mkdir -p /hadoop/dfs/name && sudo chown -R hadoop:users /hadoop && exec /opt/starter.sh \"$$@\"", "--"]
+    command: ["hdfs", "namenode"]
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    volumes:
+      - namenode-data:/hadoop/dfs/name
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml:ro
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9870/ || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      taxi-hadoop-net:
+        ipv4_address: 172.28.0.2
+
+  datanode1:
+    image: apache/hadoop:3
+    container_name: taxi-datanode1
+    hostname: datanode1
+    restart: always
+    depends_on:
+      namenode:
+        condition: service_healthy
+    environment:
+      - WAITFOR=namenode:9000
+      - WAITFOR_TIMEOUT=60
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+    entrypoint: ["sh", "-c", "sudo mkdir -p /hadoop/dfs/data && sudo chown -R hadoop:users /hadoop && exec /opt/starter.sh \"$$@\"", "--"]
+    command: ["hdfs", "datanode"]
+    ports:
+      - "9864:9864"
+    volumes:
+      - datanode1-data:/hadoop/dfs/data
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml:ro
+    networks:
+      taxi-hadoop-net:
+        ipv4_address: 172.28.0.3
+
+  datanode2:
+    image: apache/hadoop:3
+    container_name: taxi-datanode2
+    hostname: datanode2
+    restart: always
+    depends_on:
+      namenode:
+        condition: service_healthy
+    environment:
+      - WAITFOR=namenode:9000
+      - WAITFOR_TIMEOUT=60
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+    entrypoint: ["sh", "-c", "sudo mkdir -p /hadoop/dfs/data && sudo chown -R hadoop:users /hadoop && exec /opt/starter.sh \"$$@\"", "--"]
+    command: ["hdfs", "datanode"]
+    ports:
+      - "9865:9864"
+    volumes:
+      - datanode2-data:/hadoop/dfs/data
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml:ro
+    networks:
+      taxi-hadoop-net:
+        ipv4_address: 172.28.0.4
+
+  datanode3:
+    image: apache/hadoop:3
+    container_name: taxi-datanode3
+    hostname: datanode3
+    restart: always
+    depends_on:
+      namenode:
+        condition: service_healthy
+    environment:
+      - WAITFOR=namenode:9000
+      - WAITFOR_TIMEOUT=60
+      - HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop
+    entrypoint: ["sh", "-c", "sudo mkdir -p /hadoop/dfs/data && sudo chown -R hadoop:users /hadoop && exec /opt/starter.sh \"$$@\"", "--"]
+    command: ["hdfs", "datanode"]
+    ports:
+      - "9866:9864"
+    volumes:
+      - datanode3-data:/hadoop/dfs/data
+      - ./config/core-site.xml:/opt/hadoop/etc/hadoop/core-site.xml:ro
+      - ./config/hdfs-site.xml:/opt/hadoop/etc/hadoop/hdfs-site.xml:ro
+    networks:
+      taxi-hadoop-net:
+        ipv4_address: 172.28.0.5
+
+volumes:
+  namenode-data:
+  datanode1-data:
+  datanode2-data:
+  datanode3-data:
+
+networks:
+  taxi-hadoop-net:
+    name: taxi-hadoop-net
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16

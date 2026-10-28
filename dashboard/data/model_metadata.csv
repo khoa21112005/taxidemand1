@@ -1,0 +1,2 @@
+features,generated_at_utc,lookup_rows,low_max,max_depth,medium_max,model,num_trees,test_period,test_rows,train_period,train_rows,validation_period,validation_rows
+"zone_id,hour_of_day,day_of_week,month,is_weekend,historical_mean",2026-10-15T02:00:42.141503+00:00,534240,1.7055447623629234,8,10.574884219350162,RandomForestRegressor,20,2024-11-01 to 2024-12-31,387960,2023-01-01 to 2024-09-30,4064040,2024-10-01 to 2024-10-31,197160

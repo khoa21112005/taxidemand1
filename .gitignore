@@ -1,0 +1,35 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.sparkStaging/
+derby.log
+metastore_db/
+*.crc
+**/_SUCCESS
+
+# Large/raw datasets stay local.
+*.parquet
+
+# Generated datasets and reports stay local; keep the folder structure.
+data/cleaned/*
+!data/cleaned/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+output/*
+!output/.gitkeep
+
+# Dashboard summary/model exports are compact demo inputs for Streamlit. Keep the
+# bulky source data and volatile Kafka snapshot out of Git; keep the small lookup
+# Parquet so the prediction page works immediately after cloning the repository.
+dashboard/data/*
+!dashboard/data/*.csv
+dashboard/data/realtime_events.csv
+!dashboard/data/prediction_lookup/
+!dashboard/data/prediction_lookup/**/
+!dashboard/data/prediction_lookup/**/*.parquet
